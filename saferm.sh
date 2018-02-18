@@ -34,7 +34,7 @@ isResponseYes(){
 	if [[ ${response:0:1} == 'y' || ${response:0:1} == 'Y' ]]
 	then
 		true
-	else2
+	else
 		false
 	fi
 
