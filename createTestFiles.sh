@@ -4,6 +4,8 @@ argFirst="$( echo $@ | awk '{ print $1 }')"
 argLast="$( echo $@ | awk '{ print $NF }' | xargs)"
 subDirectoryNameOptions="$( echo $@ | awk '{$1=""; print $0}' | awk '{$NF=""; print $0}' )"
 
+logFile="test.log"
+
 
 cFlag=0
 rFlag=0
@@ -20,9 +22,8 @@ createFileStructureAll(){
 
   #create an array of possible names that can be used for subdirectories
   arrayOfNameOptions=($rArg1)
+  echo "arrayOfNameOptions = $arrayOfNameOptions"
   arrayOfNameOptionsLength=${#arrayOfNameOptions[@]}
-  arrayOfNameOptionsLength=$(($arrayOfNameOptionsLength - 2))
-  immidiateChildOfParentDirFileCount=5
 
   parentLevelDir="$2"
 
@@ -46,7 +47,8 @@ createFileStructureAll(){
   for ((y=0; y <= randOneToThree; y++))
   do
 
-    randWithinArrayLength=$(echo $(($RANDOM % $arrayOfNameOptionsLength)))
+    randWithinArrayLength=$(($RANDOM % $arrayOfNameOptionsLength))
+    echo "randWithinArrayLength = $randWithinArrayLength" >> $logFile
     randomArrayItem=$(echo ${arrayOfNameOptions[$randWithinArrayLength]})
     dirToCreate="$parentLevelFilename""/$randomArrayItem""_$y"
     mkdir "$dirToCreate"
@@ -59,11 +61,6 @@ createFileStructureAll(){
   done
 
 }
-
-# for i in `seq $argLast`
-# do
-#   createFileStructure $i
-# done
 
 bArg1="myTestDir"
 
@@ -102,6 +99,7 @@ while getopts "b:c:r:" opt; do
   esac
 done
 shift "$(($OPTIND -1))"
+
 
 
 if [[ $rFlag -eq 1 && $cFlag -eq 1 && $bFlag -eq 1 ]]
