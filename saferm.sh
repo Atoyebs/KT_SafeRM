@@ -14,7 +14,7 @@ treeDepthIterationArray[0]=1
 doesDirectoryExist(){
     if [ ! -d "$2/$1" ]; then
         mkdir "$2/$1"
-        echo "Created Directory $2/$1 because it didn't previously exist"
+#        echo "Created Directory $2/$1 because it didn't previously exist"
     fi
 }
 
@@ -75,6 +75,7 @@ finalDeleteOfDirectory(){
 	if [ $? -eq $srmTrue ]
 	then
 
+		#reduce treedepth by 1
 		treeDepth=$((treeDepth - 1))
 
 		directoryContentsCount=$(ls -l "$1" | sort -k1,1 | awk -F " " '{print $NF}' | sed -e '$ d' | wc -l | xargs)
@@ -136,6 +137,8 @@ recursivelyDeleteContentsOfDirectory(){
 			then
 				recursivelyDeleteContentsOfDirectory "$currentDir/$item"
 			fi
+
+#======================================================================================================
 
 			#reduce the number of iterations remaining by 1
 			treeDepthIterationArray[$treeDepth]=$(( ${treeDepthIterationArray[$treeDepth]} - 1 ))
