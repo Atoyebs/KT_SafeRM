@@ -4,19 +4,30 @@ argFirst="$( echo $@ | awk '{ print $1 }')"
 argLast="$( echo $@ | awk '{ print $NF }' | xargs)"
 subDirectoryNameOptions="$( echo $@ | awk '{$1=""; print $0}' | awk '{$NF=""; print $0}' )"
 
+
+cFlag=0
+rFlag=0
+bFlag=0
+
+cArg1=0
+rArg1=""
+bArg1=""
+
+
+
 #create a specific file structure
-createFileStructure(){
-
-  parentLevelDir="$argFirst"
-
-  #3 number of iterations
-  iteration=$1
+createFileStructureAll(){
 
   #create an array of possible names that can be used for subdirectories
-  arrayOfNameOptions=($subDirectoryNameOptions)
+  arrayOfNameOptions=($rArg1)
   arrayOfNameOptionsLength=${#arrayOfNameOptions[@]}
   arrayOfNameOptionsLength=$(($arrayOfNameOptionsLength - 2))
   immidiateChildOfParentDirFileCount=5
+
+  parentLevelDir="$2"
+
+  #3 number of iterations
+  iteration=$1
 
   randOneToTwelve=$(( ($RANDOM % 10) + 2 ))
   randOneToThree=$(( ($RANDOM % 3) + 1 ))
@@ -49,26 +60,56 @@ createFileStructure(){
 
 }
 
-for i in `seq $argLast`
-do
-  createFileStructure $i
-done
-
-# while getopts ":fda" opt; do
-#   case $opt in
-#     f)
-#       echo "-f was triggered!" >&2
-#       ;;
-#     d)
-#       echo "-d was triggered!" >&2
-#       ;;
-#     a)
-#       echo "-i was triggered!" >&2
-#       ;;
-#     \?)
-#       echo "Invalid option: -$OPTARG" >&2
-#       ;;
-#   esac
+# for i in `seq $argLast`
+# do
+#   createFileStructure $i
 # done
-#
-# shift "$(($OPTIND -1))"
+
+bArg1="myTestDir"
+
+while getopts "b:c:r:" opt; do
+  case $opt in
+
+    b) #base name
+
+      bFlag=1
+      bArg1=$OPTARG
+
+      ;;
+    c) #count
+      regexNumber='^[0-9]+$'
+
+      #if the argument passed in to the option is a number
+      if [[ $OPTARG =~ $regexNumber ]]
+      then
+        cFlag=1
+        cArg1=$OPTARG
+      else
+        echo "cdf: error -c option only takes whole numbers"
+        exit $?
+      fi
+      ;;
+
+    r)
+
+      rFlag=1;
+      rArg1=$OPTARG
+      ;;
+
+    \?)
+      echo "cdf: error invalid option: -$OPTARG"
+      ;;
+  esac
+done
+shift "$(($OPTIND -1))"
+
+
+if [[ $rFlag -eq 1 && $cFlag -eq 1 && $bFlag -eq 1 ]]
+then
+  for i in `seq $cArg1`
+  do
+    createFileStructureAll $i $bArg1 $rArg1
+  done
+else
+  echo "cdf: error all options -c (count) -b (baseDirName) -r(random dir name) must be provided"
+fi
